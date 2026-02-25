@@ -1,0 +1,15 @@
+{
+  "name": "Voice Studio Pro",
+  "short_name": "Voice",
+  "start_url": "./tts_app.html",
+  "display": "standalone",
+  "background_color": "#1e1e2e",
+  "theme_color": "#1e1e2e",
+  "icons": [
+    {
+      "src": "voice_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
