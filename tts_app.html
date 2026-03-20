@@ -154,7 +154,7 @@
         // ==========================================
         // 2. 구글 로그인 시스템
         // ==========================================
-        function signInWithGoogle() { auth.signInWithPopup(provider); }
+        function signInWithGoogle() { auth.signInWithRedirect(provider); }
         function signOut() { auth.signOut(); }
 
         auth.onAuthStateChanged((user) => {
