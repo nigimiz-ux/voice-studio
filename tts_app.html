@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Studio V3 (Login Edition)</title>
+    <title>Voice Studio V3 (Live Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -35,20 +35,19 @@
                     </div>
                 </div>
             </div>
-            <p class="text-gray-400 mb-6 text-sm">Personal English Voice Tutor (Secured)</p>
+            <p class="text-gray-400 mb-6 text-sm">Personal English Voice Tutor (Live & Secured)</p>
 
             <div class="mb-5 flex-1 flex flex-col">
                 <label class="block text-sm font-bold text-gray-400 mb-2 hover:text-indigo-400 cursor-pointer"
                     onclick="document.getElementById('textInput').value=''">대본 (Script) <span
                         class="text-xs font-normal text-gray-600">[비우기 클릭]</span></label>
                 <textarea id="textInput"
-                    class="w-full flex-1 bg-[#25262b] border border-gray-700 rounded-lg p-4 text-gray-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none transition text-lg"
+                    class="w-full flex-1 bg-[#25262b] border border-gray-700 rounded-lg p-4 text-gray-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none transition text-lg leading-relaxed"
                     placeholder="우측 뉴스를 요약 듣기 하거나, 기사 전문을 이곳에 붙여넣으세요..."></textarea>
             </div>
 
             <div class="mb-5">
-                <label class="block text-sm font-bold text-gray-400 mb-2">음성 선택 (Voice) <span
-                        class="text-xs font-normal text-gray-600">(폰 설정에서 구글 엔진 권장)</span></label>
+                <label class="block text-sm font-bold text-gray-400 mb-2">음성 선택 (Voice)</label>
                 <select id="voiceSelect"
                     class="w-full bg-[#25262b] border border-gray-700 rounded-lg p-3 text-gray-200 focus:outline-none focus:border-indigo-500 transition appearance-none cursor-pointer">
                     <option value="">목소리를 불러오는 중...</option>
@@ -78,32 +77,33 @@
 
         <div class="lg:w-5/12 flex flex-col gap-6 h-[850px]">
 
-            <div class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[45%]">
+            <div class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[55%]">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 text-white">
                         <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> Today's Global News
                     </h2>
                     <button onclick="loadLiveNews()"
-                        class="flex items-center gap-1.5 text-xs text-gray-400 bg-[#25262b] hover:bg-gray-700 px-3 py-1.5 rounded-full border border-gray-700 transition">🔄
-                        뉴스 새로고침</button>
+                        class="flex items-center gap-1.5 text-xs text-gray-400 bg-[#25262b] hover:bg-gray-700 px-3 py-1.5 rounded-full border border-gray-700 transition">
+                        🔄 뉴스 새로고침
+                    </button>
                 </div>
 
                 <div id="newsList" class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                    <p class="text-xs text-gray-500 text-center mt-6">뉴스를 불러오는 중...</p>
+                    <p class="text-xs text-gray-500 text-center mt-6">뉴스를 불러오는 중... 📡</p>
                 </div>
             </div>
 
             <div id="memoArea"
-                class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[55%] opacity-40 transition-opacity duration-300">
+                class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[45%] opacity-40 transition-opacity duration-300 relative">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 text-white">📌 Study Memos</h2>
                     <span
                         class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">나만의
-                        비밀 비밀 메모</span>
+                        비밀 메모</span>
                 </div>
 
                 <div id="memoOverlay"
-                    class="absolute inset-x-6 inset-y-6 flex flex-col items-center justify-center bg-[#1c1d21]/95 rounded-2xl z-10 text-center">
+                    class="absolute inset-x-6 inset-y-16 flex flex-col items-center justify-center bg-[#1c1d21]/95 rounded-2xl z-10 text-center">
                     <p class="text-2xl mb-2">🔒</p>
                     <p class="text-sm font-bold text-gray-300 mb-3">메모장을 사용하시려면</p>
                     <button onclick="signInWithGoogle()"
@@ -132,10 +132,10 @@
 
     <script>
         // ==========================================
-        // 1. 파이어베이스 연결 설정
+        // 1. 파이어베이스 인증 및 DB 설정
         // ==========================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDcQNHIUYSbJe8qnc4EqzRpGmQ4qufz7Ok",
+            apiKey: "AIzaSyDcQNHIUYSbJe8qnc4EqzRpGmQ4qufz70k",
             authDomain: "aje-executive-db.firebaseapp.com",
             databaseURL: "https://aje-executive-db-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "aje-executive-db",
@@ -152,7 +152,54 @@
         let memoRef = null;
 
         // ==========================================
-        // 2. 학습 메모장 로직 (로그인 기반)
+        // 2. 구글 로그인 시스템
+        // ==========================================
+        function signInWithGoogle() { auth.signInWithPopup(provider); }
+        function signOut() { auth.signOut(); }
+
+        auth.onAuthStateChanged((user) => {
+            const btnLogin = document.getElementById('btnLogin');
+            const userInfo = document.getElementById('userInfo');
+            const memoArea = document.getElementById('memoArea');
+            const memoOverlay = document.getElementById('memoOverlay');
+            const memoInput = document.getElementById('memoInput');
+            const btnMemoAdd = document.getElementById('btnMemoAdd');
+
+            if (user) {
+                // 로그인 완료 시
+                currentUser = user;
+                btnLogin.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                document.getElementById('userPhoto').src = user.photoURL;
+                document.getElementById('userName').textContent = user.displayName;
+
+                // 가림막 치우고 활성화
+                memoArea.classList.remove('opacity-40');
+                memoOverlay.classList.add('hidden');
+                memoInput.disabled = false;
+                btnMemoAdd.disabled = false;
+
+                loadUserMemos(user.uid);
+            } else {
+                // 로그아웃 시
+                currentUser = null;
+                if (memoRef) memoRef.off();
+                memoRef = null;
+
+                btnLogin.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+
+                // 가림막 다시 덮기
+                memoArea.classList.add('opacity-40');
+                memoOverlay.classList.remove('hidden');
+                memoInput.disabled = true;
+                btnMemoAdd.disabled = true;
+                document.getElementById('memoList').innerHTML = '<p class="text-xs text-gray-500 text-center mt-4">로그인하면 나만의 학습 메모장이 열립니다.</p>';
+            }
+        });
+
+        // ==========================================
+        // 3. 파이어베이스 학습 메모장 로직
         // ==========================================
         function addMemo() {
             if (!currentUser || !memoRef) return;
@@ -188,56 +235,10 @@
                 });
             });
         }
-
         function deleteMemo(id) { if (memoRef) memoRef.child(id).remove(); }
 
         // ==========================================
-        // 3. 구글 인증 (로그인/로그아웃)
-        // ==========================================
-        function signInWithGoogle() { auth.signInWithPopup(provider); }
-        function signOut() { auth.signOut(); }
-
-        auth.onAuthStateChanged((user) => {
-            const btnLogin = document.getElementById('btnLogin');
-            const userInfo = document.getElementById('userInfo');
-            const memoArea = document.getElementById('memoArea');
-            const memoOverlay = document.getElementById('memoOverlay');
-            const memoInput = document.getElementById('memoInput');
-            const btnMemoAdd = document.getElementById('btnMemoAdd');
-
-            if (user) {
-                currentUser = user;
-                btnLogin.classList.add('hidden');
-                userInfo.classList.remove('hidden');
-                document.getElementById('userPhoto').src = user.photoURL;
-                document.getElementById('userName').textContent = user.displayName;
-
-                memoArea.classList.remove('opacity-40');
-                memoArea.classList.add('relative');
-                memoOverlay.classList.add('hidden');
-                memoInput.disabled = false;
-                btnMemoAdd.disabled = false;
-
-                loadUserMemos(user.uid);
-            } else {
-                currentUser = null;
-                if (memoRef) memoRef.off();
-                memoRef = null;
-
-                btnLogin.classList.remove('hidden');
-                userInfo.classList.add('hidden');
-
-                memoArea.classList.add('opacity-40');
-                memoArea.classList.remove('relative');
-                memoOverlay.classList.remove('hidden');
-                memoInput.disabled = true;
-                btnMemoAdd.disabled = true;
-                document.getElementById('memoList').innerHTML = '<p class="text-xs text-gray-500 text-center mt-4">로그인하면 나만의 학습 메모장이 열립니다.</p>';
-            }
-        });
-
-        // ==========================================
-        // 4. 실시간 BBC 뉴스 API 연동 (에러 없음)
+        // 4. 실시간 라이브 BBC 뉴스 연동
         // ==========================================
         async function loadLiveNews() {
             const newsList = document.getElementById('newsList');
@@ -269,14 +270,16 @@
                         else if (item.link.includes('/politics')) cat = 'Politics';
 
                         const card = document.createElement('div');
-                        card.className = "bg-[#25262b] p-4 rounded-lg border border-gray-700 transition group";
+                        card.className = "bg-[#25262b] p-4 rounded-lg border border-gray-700 transition group flex flex-col justify-between";
                         card.innerHTML = `
-                            <div class="flex justify-between items-center mb-1.5">
-                                <h3 class="font-bold text-sm text-gray-200 group-hover:text-indigo-400 line-clamp-2" id="liveTitle_${i}">${item.title}</h3>
-                                <span class="text-[10px] text-indigo-300 bg-indigo-500/10 px-1.5 py-0.5 rounded flex-shrink-0 ml-2">${cat}</span>
+                            <div>
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <h3 class="font-bold text-sm text-gray-200 group-hover:text-indigo-400 line-clamp-2" id="liveTitle_${i}">${item.title}</h3>
+                                    <span class="text-[10px] text-indigo-300 bg-indigo-500/10 px-1.5 py-0.5 rounded flex-shrink-0 ml-2">${cat}</span>
+                                </div>
+                                <p class="text-xs text-gray-400 mb-3 line-clamp-2" id="liveDesc_${i}">${cleanDesc}</p>
                             </div>
-                            <p class="text-xs text-gray-400 mb-3 line-clamp-2" id="liveDesc_${i}">${cleanDesc}</p>
-                            <div class="flex gap-2 relative z-0">
+                            <div class="flex gap-2 relative z-0 mt-2">
                                 <button onclick="loadToEditor('liveTitle_${i}', 'liveDesc_${i}')" class="flex-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊 요약 듣기</button>
                                 <button onclick="window.open('${item.link}', '_blank')" class="flex-1 bg-gray-700/50 hover:bg-gray-700 text-gray-300 text-xs font-bold py-2 rounded transition">🔗 전문 보기</button>
                             </div>
@@ -291,10 +294,10 @@
 
             if (refreshBtn) setTimeout(() => refreshBtn.innerHTML = '🔄 뉴스 새로고침', 500);
         }
-        loadLiveNews();
+        loadLiveNews(); // 시작할 때 뉴스 불러오기
 
         // ==========================================
-        // 5. 음성 합성(TTS) 및 낭독기 로직 (복구 완료)
+        // 5. 음성 합성(TTS) 엔진 (구글 우선 세팅)
         // ==========================================
         const synth = window.speechSynthesis;
         const voiceSelect = document.getElementById('voiceSelect');
@@ -306,7 +309,7 @@
             voices = synth.getVoices().filter(voice => voice.lang.includes('en'));
             voiceSelect.innerHTML = '';
             if (voices.length === 0) {
-                voiceSelect.innerHTML = '<option>영어 음성을 찾을 수 없습니다.</option>';
+                voiceSelect.innerHTML = '<option>음성 데이터를 불러올 수 없습니다.</option>';
                 return;
             }
             voices.forEach((voice, i) => {
@@ -315,6 +318,7 @@
                 option.value = i;
                 voiceSelect.appendChild(option);
             });
+            // Google US English 1순위 탐색
             let bestIndex = voices.findIndex(v => v.name.includes('Google') && v.lang.includes('en-US'));
             if (bestIndex === -1) bestIndex = voices.findIndex(v => v.lang.includes('en-US'));
             if (bestIndex !== -1) voiceSelect.selectedIndex = bestIndex;
@@ -361,7 +365,6 @@
             background: #4f46e5;
         }
 
-        /* range slider styling */
         input[type=range]::-webkit-slider-thumb {
             border-radius: 100px;
             box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
