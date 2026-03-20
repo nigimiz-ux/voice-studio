@@ -16,7 +16,7 @@
 
         <div class="lg:w-7/12 bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[800px]">
             <h1 class="text-3xl font-extrabold text-center mb-2 text-white">Voice Studio <span
-                    class="text-indigo-500">V2</span></h1>
+                    class="text-indigo-500">V2.1</span></h1>
             <p class="text-center text-gray-400 mb-6 text-sm">Personal English Voice Tutor</p>
 
             <div class="mb-5 flex-1 flex flex-col">
@@ -95,6 +95,48 @@
                                 전문 보기</button>
                         </div>
                     </div>
+                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
+                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle3">US economy adds 275,000 jobs in
+                            February</h3>
+                        <p class="text-xs text-gray-400 mb-3" id="newsDesc3">The US job market remained surprisingly
+                            robust last month, defying expectations of a slowdown amid high interest rates.</p>
+                        <div class="flex gap-2">
+                            <button onclick="loadToEditor('newsTitle3', 'newsDesc3')"
+                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
+                                요약 듣기</button>
+                            <button onclick="window.open('https://www.bbc.com/news/business', '_blank')"
+                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
+                                전문 보기</button>
+                        </div>
+                    </div>
+                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
+                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle4">SpaceX successfully launches
+                            latest Starship rocket</h3>
+                        <p class="text-xs text-gray-400 mb-3" id="newsDesc4">Elon Musk's company has achieved a major
+                            milestone as its massive Starship vehicle reached orbit for the first time.</p>
+                        <div class="flex gap-2">
+                            <button onclick="loadToEditor('newsTitle4', 'newsDesc4')"
+                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
+                                요약 듣기</button>
+                            <button onclick="window.open('https://www.bbc.com/news/science_and_environment', '_blank')"
+                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
+                                전문 보기</button>
+                        </div>
+                    </div>
+                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
+                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle5">AI regulations: EU lawmakers
+                            pass landmark legislation</h3>
+                        <p class="text-xs text-gray-400 mb-3" id="newsDesc5">The European Parliament has approved the
+                            world's first comprehensive framework for artificial intelligence risk management.</p>
+                        <div class="flex gap-2">
+                            <button onclick="loadToEditor('newsTitle5', 'newsDesc5')"
+                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
+                                요약 듣기</button>
+                            <button onclick="window.open('https://www.bbc.com/news/technology', '_blank')"
+                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
+                                전문 보기</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -111,7 +153,7 @@
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="memoInput"
                         class="flex-1 bg-[#25262b] border border-gray-700 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-emerald-500"
-                        placeholder="공부할 표현이나 단어를 메모하세요...">
+                        placeholder="공부할 표현이나 단어를 메모하세요..." onkeypress="if(event.keyCode==13) addMemo()">
                     <button onclick="addMemo()"
                         class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition">추가</button>
                 </div>
@@ -125,9 +167,7 @@
     </div>
 
     <script>
-        // ==========================================
-        // 🚨 1. 파이어베이스 연결 (임원님 설정값 필수!)
-        // ==========================================
+        // 🚨 1. 파이어베이스 연결 (임원님 설정값)
         const firebaseConfig = {
             apiKey: "AIzaSyDcQNHIUYSbJe8qnc4EqzRpGmQ4qufz7Ok",
             authDomain: "aje-executive-db.firebaseapp.com",
@@ -140,39 +180,27 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
-        // ==========================================
-        // 2. 학습 메모장 로직 (추가/불러오기/삭제)
-        // ==========================================
+        // 📝 2. 학습 메모장
         const memoRef = database.ref('study_memos');
 
-        // 메모 추가하기
         function addMemo() {
             const input = document.getElementById('memoInput');
             const text = input.value.trim();
             if (!text) return;
-
-            memoRef.push({
-                text: text,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-            input.value = ''; // 입력창 비우기
+            memoRef.push({ text: text, timestamp: firebase.database.ServerValue.TIMESTAMP });
+            input.value = '';
         }
 
-        // 메모 실시간 불러오기
         memoRef.on('value', (snapshot) => {
             const memoList = document.getElementById('memoList');
-            memoList.innerHTML = ''; // 초기화
-
+            memoList.innerHTML = '';
             if (!snapshot.exists()) {
                 memoList.innerHTML = '<p class="text-xs text-gray-500 text-center mt-4">저장된 학습 메모가 없습니다.</p>';
                 return;
             }
-
-            // 최신 글이 위로 오도록 배열로 변환 후 뒤집기
             const memos = [];
             snapshot.forEach(child => { memos.push({ id: child.key, ...child.val() }); });
             memos.reverse();
-
             memos.forEach(memo => {
                 const item = document.createElement('div');
                 item.className = "flex justify-between items-center bg-[#25262b] p-3 rounded-lg border border-gray-700 hover:border-gray-500 transition group";
@@ -186,21 +214,15 @@
             });
         });
 
-        // 메모 삭제하기 (학습 완료!)
-        function deleteMemo(id) {
-            memoRef.child(id).remove();
-        }
+        function deleteMemo(id) { memoRef.child(id).remove(); }
 
-        // ==========================================
-        // 3. 음성 낭독기 로직 (속도/재생/정지)
-        // ==========================================
+        // 🎙️ 3. 낭독기 
         const synth = window.speechSynthesis;
         const voiceSelect = document.getElementById('voiceSelect');
         const textInput = document.getElementById('textInput');
         const rateSlider = document.getElementById('rateSlider');
         let voices = [];
 
-        // 영어 성우만 불러오기
         function populateVoiceList() {
             voices = synth.getVoices().filter(voice => voice.lang.includes('en'));
             voiceSelect.innerHTML = '';
@@ -209,32 +231,35 @@
                 voiceSelect.innerHTML = '<option>영어 음성을 찾을 수 없습니다.</option>';
                 return;
             }
+
             voices.forEach((voice, i) => {
                 const option = document.createElement('option');
                 option.textContent = `${voice.name} (${voice.lang})`;
                 option.value = i;
                 voiceSelect.appendChild(option);
             });
+
+            // 💡 콩글리쉬 방지: 똑똑한 구글/미국 성우를 1순위로 자동 선택!
+            let bestVoiceIndex = voices.findIndex(v => v.name.includes('Google') && v.lang.includes('en-US'));
+            if (bestVoiceIndex === -1) bestVoiceIndex = voices.findIndex(v => v.lang.includes('en-US'));
+            if (bestVoiceIndex !== -1) voiceSelect.selectedIndex = bestVoiceIndex;
         }
+
         populateVoiceList();
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = populateVoiceList;
         }
 
-        // 속도 조절 텍스트
         rateSlider.oninput = function () { document.getElementById('rateValue').textContent = Number(this.value).toFixed(1); }
 
-        // [🔊 요약 듣기] 버튼 누르면 대본창으로 텍스트 쏘기
         function loadToEditor(titleId, descId) {
             const title = document.getElementById(titleId).innerText;
             const desc = document.getElementById(descId).innerText;
             textInput.value = `${title}.\n\n${desc}`;
-            // 반짝 효과
             textInput.classList.add('ring-2', 'ring-indigo-500');
             setTimeout(() => textInput.classList.remove('ring-2', 'ring-indigo-500'), 300);
         }
 
-        // 재생
         function speakText() {
             if (synth.speaking) synth.cancel();
             if (textInput.value !== '') {
@@ -248,7 +273,6 @@
             }
         }
 
-        // 정지
         function stopText() { synth.cancel(); }
     </script>
 
