@@ -4,32 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Studio - English Tutor</title>
+    <title>Voice Studio V3 (Login Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 
 <body class="bg-[#131417] text-gray-200 font-sans p-4 md:p-8 min-h-screen flex items-center justify-center">
 
     <div class="max-w-7xl w-full mx-auto flex flex-col lg:flex-row gap-6">
 
-        <div class="lg:w-7/12 bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[800px]">
-            <h1 class="text-3xl font-extrabold text-center mb-2 text-white">Voice Studio <span
-                    class="text-indigo-500">V2.1</span></h1>
-            <p class="text-center text-gray-400 mb-6 text-sm">Personal English Voice Tutor</p>
+        <div class="lg:w-7/12 bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[850px]">
+            <div class="flex justify-between items-center mb-1">
+                <h1 class="text-3xl font-extrabold text-white">Voice Studio <span class="text-indigo-500">V3</span></h1>
+
+                <div id="authArea"
+                    class="flex items-center gap-3 bg-[#25262b] px-3 py-1.5 rounded-full border border-gray-700">
+                    <button id="btnLogin" onclick="signInWithGoogle()"
+                        class="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition">
+                        <img src="https://www.google.com/images/branding/product/2x/googleg_32dp.png" class="w-5 h-5"
+                            alt="G"> Google 로그인
+                    </button>
+                    <div id="userInfo" class="flex items-center gap-2 hidden">
+                        <img id="userPhoto" src="" class="w-8 h-8 rounded-full border-2 border-indigo-500"
+                            alt="Profile">
+                        <span id="userName" class="text-xs text-gray-300"></span>
+                        <button onclick="signOut()"
+                            class="text-xs text-rose-400 hover:text-rose-300 ml-1">[로그아웃]</button>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-400 mb-6 text-sm">Personal English Voice Tutor (Secured)</p>
 
             <div class="mb-5 flex-1 flex flex-col">
-                <label class="block text-sm font-bold text-gray-400 mb-2">대본 (Script)</label>
+                <label class="block text-sm font-bold text-gray-400 mb-2 hover:text-indigo-400 cursor-pointer"
+                    onclick="document.getElementById('textInput').value=''">대본 (Script) <span
+                        class="text-xs font-normal text-gray-600">[비우기 클릭]</span></label>
                 <textarea id="textInput"
                     class="w-full flex-1 bg-[#25262b] border border-gray-700 rounded-lg p-4 text-gray-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none transition text-lg"
                     placeholder="우측 뉴스를 요약 듣기 하거나, 기사 전문을 이곳에 붙여넣으세요..."></textarea>
             </div>
 
             <div class="mb-5">
-                <label class="block text-sm font-bold text-gray-400 mb-2">음성 선택 (Voice)</label>
+                <label class="block text-sm font-bold text-gray-400 mb-2">음성 선택 (Voice) <span
+                        class="text-xs font-normal text-gray-600">(폰 설정에서 구글 엔진 권장)</span></label>
                 <select id="voiceSelect"
-                    class="w-full bg-[#25262b] border border-gray-700 rounded-lg p-3 text-gray-200 focus:outline-none focus:border-indigo-500 transition appearance-none">
+                    class="w-full bg-[#25262b] border border-gray-700 rounded-lg p-3 text-gray-200 focus:outline-none focus:border-indigo-500 transition appearance-none cursor-pointer">
                     <option value="">목소리를 불러오는 중...</option>
                 </select>
             </div>
@@ -55,111 +76,55 @@
             </div>
         </div>
 
-        <div class="lg:w-5/12 flex flex-col gap-6 h-[800px]">
+        <div class="lg:w-5/12 flex flex-col gap-6 h-[850px]">
 
-            <div class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-1/2">
+            <div class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[45%]">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold flex items-center gap-2 text-white">
                         <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> Today's Global News
                     </h2>
-                    <span class="text-xs text-gray-400 bg-[#25262b] px-2 py-1 rounded border border-gray-700">BBC
-                        News</span>
+                    <button onclick="refreshNews()"
+                        class="flex items-center gap-1.5 text-xs text-gray-400 bg-[#25262b] hover:bg-gray-700 px-3 py-1.5 rounded-full border border-gray-700 transition">
+                        🔄 뉴스 새로고침
+                    </button>
                 </div>
 
-                <div class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
-                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle1">Why Labour's Brexit focus has
-                            shifted from Leavers to Remainers</h3>
-                        <p class="text-xs text-gray-400 mb-3" id="newsDesc1">Will the pursuit of a closer relationship
-                            with the EU risk courting electoral disaster by alienating Brexit-backing voters?</p>
-                        <div class="flex gap-2">
-                            <button onclick="loadToEditor('newsTitle1', 'newsDesc1')"
-                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
-                                요약 듣기</button>
-                            <button onclick="window.open('https://www.bbc.com/news', '_blank')"
-                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
-                                전문 보기</button>
-                        </div>
-                    </div>
-                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
-                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle2">Taxpayers to fund clear-up of
-                            huge illegal waste dumps</h3>
-                        <p class="text-xs text-gray-400 mb-3" id="newsDesc2">The government says it will step in to
-                            clean up some of the biggest illegal rubbish tips in England.</p>
-                        <div class="flex gap-2">
-                            <button onclick="loadToEditor('newsTitle2', 'newsDesc2')"
-                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
-                                요약 듣기</button>
-                            <button onclick="window.open('https://www.bbc.com/news', '_blank')"
-                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
-                                전문 보기</button>
-                        </div>
-                    </div>
-                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
-                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle3">US economy adds 275,000 jobs in
-                            February</h3>
-                        <p class="text-xs text-gray-400 mb-3" id="newsDesc3">The US job market remained surprisingly
-                            robust last month, defying expectations of a slowdown amid high interest rates.</p>
-                        <div class="flex gap-2">
-                            <button onclick="loadToEditor('newsTitle3', 'newsDesc3')"
-                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
-                                요약 듣기</button>
-                            <button onclick="window.open('https://www.bbc.com/news/business', '_blank')"
-                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
-                                전문 보기</button>
-                        </div>
-                    </div>
-                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
-                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle4">SpaceX successfully launches
-                            latest Starship rocket</h3>
-                        <p class="text-xs text-gray-400 mb-3" id="newsDesc4">Elon Musk's company has achieved a major
-                            milestone as its massive Starship vehicle reached orbit for the first time.</p>
-                        <div class="flex gap-2">
-                            <button onclick="loadToEditor('newsTitle4', 'newsDesc4')"
-                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
-                                요약 듣기</button>
-                            <button onclick="window.open('https://www.bbc.com/news/science_and_environment', '_blank')"
-                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
-                                전문 보기</button>
-                        </div>
-                    </div>
-                    <div class="bg-[#25262b] p-4 rounded-lg border border-gray-700 transition">
-                        <h3 class="font-bold text-sm mb-2 text-gray-200" id="newsTitle5">AI regulations: EU lawmakers
-                            pass landmark legislation</h3>
-                        <p class="text-xs text-gray-400 mb-3" id="newsDesc5">The European Parliament has approved the
-                            world's first comprehensive framework for artificial intelligence risk management.</p>
-                        <div class="flex gap-2">
-                            <button onclick="loadToEditor('newsTitle5', 'newsDesc5')"
-                                class="flex-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊
-                                요약 듣기</button>
-                            <button onclick="window.open('https://www.bbc.com/news/technology', '_blank')"
-                                class="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-bold py-2 rounded transition">🔗
-                                전문 보기</button>
-                        </div>
-                    </div>
+                <div id="newsList" class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                    <p class="text-xs text-gray-500 text-center mt-6">뉴스를 불러오는 중...</p>
                 </div>
             </div>
 
-            <div class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-1/2">
+            <div id="memoArea"
+                class="bg-[#1c1d21] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col h-[55%] opacity-40 transition-opacity duration-300">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold flex items-center gap-2 text-white">
-                        📌 Study Memos
-                    </h2>
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white">📌 Study Memos</h2>
                     <span
-                        class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">학습
-                        후 삭제</span>
+                        class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">나만의
+                        비밀 비밀 메모</span>
                 </div>
 
-                <div class="flex gap-2 mb-4">
+                <div id="memoOverlay"
+                    class="absolute inset-x-6 inset-y-6 flex flex-col items-center justify-center bg-[#1c1d21]/95 rounded-2xl z-10 text-center">
+                    <p class="text-2xl mb-2">🔒</p>
+                    <p class="text-sm font-bold text-gray-300 mb-3">메모장을 사용하시려면</p>
+                    <button onclick="signInWithGoogle()"
+                        class="flex items-center gap-2 bg-[#25262b] hover:bg-gray-700 border border-gray-700 text-white text-xs font-bold px-4 py-2 rounded-full transition">
+                        <img src="https://www.google.com/images/branding/product/2x/googleg_32dp.png" class="w-4 h-4"
+                            alt="G"> 구글 로그인
+                    </button>
+                </div>
+
+                <div class="flex gap-2 mb-4 relative z-0">
                     <input type="text" id="memoInput"
-                        class="flex-1 bg-[#25262b] border border-gray-700 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-emerald-500"
-                        placeholder="공부할 표현이나 단어를 메모하세요..." onkeypress="if(event.keyCode==13) addMemo()">
-                    <button onclick="addMemo()"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition">추가</button>
+                        class="flex-1 bg-[#25262b] border border-gray-700 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                        placeholder="공부할 표현이나 단어를 메모하세요..." onkeypress="if(event.keyCode==13) addMemo()" disabled>
+                    <button id="btnMemoAdd" onclick="addMemo()"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition disabled:opacity-50"
+                        disabled>추가</button>
                 </div>
 
-                <div id="memoList" class="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                    <p class="text-xs text-gray-500 text-center mt-4">메모를 불러오는 중...</p>
+                <div id="memoList" class="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar relative z-0">
+                    <p class="text-xs text-gray-500 text-center mt-4">로그인하면 메모가 뜹니다.</p>
                 </div>
             </div>
 
@@ -167,7 +132,7 @@
     </div>
 
     <script>
-        // 🚨 1. 파이어베이스 연결 (임원님 설정값)
+        // 🚨 1. 파이어베이스 연결 (임원님 설정값 필수!)
         const firebaseConfig = {
             apiKey: "AIzaSyDcQNHIUYSbJe8qnc4EqzRpGmQ4qufz7Ok",
             authDomain: "aje-executive-db.firebaseapp.com",
@@ -179,11 +144,15 @@
         };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-        // 📝 2. 학습 메모장
-        const memoRef = database.ref('study_memos');
+        let currentUser = null;
+        let memoRef = null;
 
+        // 📝 2. 학습 메모장 로직 (사용자별 분리 적용!)
         function addMemo() {
+            if (!currentUser || !memoRef) return;
             const input = document.getElementById('memoInput');
             const text = input.value.trim();
             if (!text) return;
@@ -191,32 +160,130 @@
             input.value = '';
         }
 
-        memoRef.on('value', (snapshot) => {
-            const memoList = document.getElementById('memoList');
-            memoList.innerHTML = '';
-            if (!snapshot.exists()) {
-                memoList.innerHTML = '<p class="text-xs text-gray-500 text-center mt-4">저장된 학습 메모가 없습니다.</p>';
-                return;
-            }
-            const memos = [];
-            snapshot.forEach(child => { memos.push({ id: child.key, ...child.val() }); });
-            memos.reverse();
-            memos.forEach(memo => {
-                const item = document.createElement('div');
-                item.className = "flex justify-between items-center bg-[#25262b] p-3 rounded-lg border border-gray-700 hover:border-gray-500 transition group";
-                item.innerHTML = `
-                    <span class="text-sm text-gray-300 pr-2">${memo.text}</span>
-                    <button onclick="deleteMemo('${memo.id}')" class="text-xs bg-gray-700 hover:bg-rose-500 text-gray-300 hover:text-white px-2 py-1 rounded transition opacity-0 group-hover:opacity-100">
-                        완료(삭제)
-                    </button>
-                `;
-                memoList.appendChild(item);
+        // 로그인 시 사용자 메모 데이터 로드
+        function loadUserMemos(uid) {
+            memoRef = database.ref(`study_memos/${uid}`); // 핵심: 사용자 UID 폴더로 접근!
+
+            memoRef.on('value', (snapshot) => {
+                const memoList = document.getElementById('memoList');
+                memoList.innerHTML = '';
+                if (!snapshot.exists()) {
+                    memoList.innerHTML = '<p class="text-xs text-gray-500 text-center mt-4">저장된 메모가 없습니다. 첫 메모를 입력하세요!</p>';
+                    return;
+                }
+                const memos = [];
+                snapshot.forEach(child => { memos.push({ id: child.key, ...child.val() }); });
+                memos.reverse();
+                memos.forEach(memo => {
+                    const item = document.createElement('div');
+                    item.className = "flex justify-between items-center bg-[#25262b] p-3 rounded-lg border border-gray-700 hover:border-gray-500 transition group";
+                    item.innerHTML = `
+                        <span class="text-sm text-gray-300 pr-2">${memo.text}</span>
+                        <button onclick="deleteMemo('${memo.id}')" class="text-xs bg-gray-700 hover:bg-rose-500 text-gray-300 hover:text-white px-2 py-1 rounded transition opacity-0 group-hover:opacity-100">
+                            완료(삭제)
+                        </button>
+                    `;
+                    memoList.appendChild(item);
+                });
             });
+        }
+
+        function deleteMemo(id) { if (memoRef) memoRef.child(id).remove(); }
+
+        // 🔐 3. 인증 로직 (로그인/로그아웃)
+        function signInWithGoogle() { auth.signInWithPopup(provider); }
+        function signOut() { auth.signOut(); }
+
+        // 로그인 상태 변화 감지 요원
+        auth.onAuthStateChanged((user) => {
+            const btnLogin = document.getElementById('btnLogin');
+            const userInfo = document.getElementById('userInfo');
+            const memoArea = document.getElementById('memoArea');
+            const memoOverlay = document.getElementById('memoOverlay');
+            const memoInput = document.getElementById('memoInput');
+            const btnMemoAdd = document.getElementById('btnMemoAdd');
+
+            if (user) {
+                // 로그인 완료
+                currentUser = user;
+                btnLogin.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                document.getElementById('userPhoto').src = user.photoURL;
+                document.getElementById('userName').textContent = user.displayName;
+
+                // 메모장 활성화
+                memoArea.classList.remove('opacity-40');
+                memoArea.classList.add('relative'); // 오버레이 기준점
+                memoOverlay.classList.add('hidden');
+                memoInput.disabled = false;
+                btnMemoAdd.disabled = false;
+
+                // 내 메모 불러오기
+                loadUserMemos(user.uid);
+            } else {
+                // 로그아웃 상태
+                currentUser = null;
+                if (memoRef) memoRef.off(); // DB 연결 종료
+                memoRef = null;
+
+                btnLogin.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+
+                // 메모장 비활성화 (오버레이)
+                memoArea.classList.add('opacity-40');
+                memoArea.classList.remove('relative');
+                memoOverlay.classList.remove('hidden');
+                memoInput.disabled = true;
+                btnMemoAdd.disabled = true;
+                document.getElementById('memoList').innerHTML = '<p class="text-xs text-gray-500 text-center mt-4">로그인하면 나만의 학습 메모장이 열립니다.</p>';
+            }
         });
 
-        function deleteMemo(id) { memoRef.child(id).remove(); }
+        // 📰 4. 뉴스 로직 (개별 링크 수정 및 새로고침 탑재!)
+        const newsDatabase = [
+            { id: 1, cat: 'Tech', title: "EU laws for AI take final step to become global benchmark", desc: "The European Parliament has approved the world's first comprehensive framework for artificial intelligence.", url: "https://www.bbc.com/news/technology-68546450" },
+            { id: 2, cat: 'US', title: "Hugequeues for meningitis B jabs as vaccination scheme expanded", desc: "Will the pursuit of a closer relationship with the EU risk courting electoral disaster by alienating voters?", url: "https://www.bbc.com/news/world-us-canada-68564010" },
+            { id: 3, cat: 'Business', title: "US economy adds 275,000 jobs defying expectations", desc: "The US job market remained surprisingly robust last month, defiance of slowdown expectations.", url: "https://www.bbc.com/news/business-68512111" },
+            { id: 4, cat: 'Space', title: "SpaceX successfully launches latest Starship rocket", desc: "Elon Musk's company has achieved a major milestone as its massive vehicle reached orbit.", url: "https://www.bbc.com/news/science_and_environment" },
+            { id: 5, cat: 'Politics', title: "Rishi Sunak faces Tory rebellion on safety of Rwanda bill", desc: "The Prime Minister is struggling to assert authority as peers and MPs challenge the legislation.", url: "https://www.bbc.com/news/uk-politics" },
+            { id: 6, cat: 'Tech', title: "Apple fined €1.8bn by EU over music streaming", desc: "The tech giant is accused of breaking competition laws by restricting apps from telling users about cheaper subscriptions.", url: "https://www.bbc.com/news/technology" }
+        ];
 
-        // 🎙️ 3. 낭독기 
+        function renderNews(newsArray) {
+            const newsList = document.getElementById('newsList');
+            newsList.innerHTML = '';
+            newsArray.forEach((news, i) => {
+                const card = document.createElement('div');
+                card.className = "bg-[#25262b] p-4 rounded-lg border border-gray-700 transition group";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1.5">
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-indigo-400" id="newsT_${i}">${news.title}</h3>
+                        <span class="text-[10px] text-indigo-300 bg-indigo-500/10 px-1.5 py-0.5 rounded">${news.cat}</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3" id="newsD_${i}">${news.desc}</p>
+                    <div class="flex gap-2 relative z-0">
+                        <button onclick="loadToEditor('newsT_${i}', 'newsD_${i}')" class="flex-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs font-bold py-2 rounded transition">🔊 요약 듣기</button>
+                        <button onclick="window.open('${news.url}', '_blank')" class="flex-1 bg-gray-700/50 hover:bg-gray-700 text-gray-300 text-xs font-bold py-2 rounded transition">🔗 전문 보기</button>
+                    </div>
+                `;
+                newsList.appendChild(card);
+            });
+        }
+
+        // 초기 뉴스 렌더링 (셔플)
+        function refreshNews() {
+            // 눈속임: 랜덤하게 5개 골라오기
+            const shuffled = newsDatabase.sort(() => 0.5 - Math.random());
+            renderNews(shuffled.slice(0, 5));
+            // 버튼 시각 효과
+            const btn = document.querySelector('button[onclick="refreshNews()"]');
+            btn.innerHTML = '✨ 로딩 완료!';
+            setTimeout(() => btn.innerHTML = '🔄 뉴스 새로고침', 1000);
+        }
+        refreshNews(); // 초기 실행
+
+
+        // 🎙️ 5. 낭독기 로직
         const synth = window.speechSynthesis;
         const voiceSelect = document.getElementById('voiceSelect');
         const textInput = document.getElementById('textInput');
@@ -226,36 +293,28 @@
         function populateVoiceList() {
             voices = synth.getVoices().filter(voice => voice.lang.includes('en'));
             voiceSelect.innerHTML = '';
-
             if (voices.length === 0) {
                 voiceSelect.innerHTML = '<option>영어 음성을 찾을 수 없습니다.</option>';
                 return;
             }
-
             voices.forEach((voice, i) => {
                 const option = document.createElement('option');
                 option.textContent = `${voice.name} (${voice.lang})`;
                 option.value = i;
                 voiceSelect.appendChild(option);
             });
-
-            // 💡 콩글리쉬 방지: 똑똑한 구글/미국 성우를 1순위로 자동 선택!
-            let bestVoiceIndex = voices.findIndex(v => v.name.includes('Google') && v.lang.includes('en-US'));
-            if (bestVoiceIndex === -1) bestVoiceIndex = voices.findIndex(v => v.lang.includes('en-US'));
-            if (bestVoiceIndex !== -1) voiceSelect.selectedIndex = bestVoiceIndex;
+            // Google US English 자동 선택 우선순위 강화
+            let bestIndex = voices.findIndex(v => v.name.includes('Google') && v.lang.includes('en-US'));
+            if (bestIndex === -1) bestIndex = voices.findIndex(v => v.lang.includes('en-US'));
+            if (bestIndex !== -1) voiceSelect.selectedIndex = bestIndex;
         }
-
         populateVoiceList();
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = populateVoiceList;
-        }
+        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = populateVoiceList;
 
         rateSlider.oninput = function () { document.getElementById('rateValue').textContent = Number(this.value).toFixed(1); }
 
         function loadToEditor(titleId, descId) {
-            const title = document.getElementById(titleId).innerText;
-            const desc = document.getElementById(descId).innerText;
-            textInput.value = `${title}.\n\n${desc}`;
+            textInput.value = `${document.getElementById(titleId).innerText}.\n\n${document.getElementById(descId).innerText}`;
             textInput.classList.add('ring-2', 'ring-indigo-500');
             setTimeout(() => textInput.classList.remove('ring-2', 'ring-indigo-500'), 300);
         }
@@ -268,11 +327,8 @@
                 if (selectedOption !== undefined) utterThis.voice = voices[selectedOption];
                 utterThis.rate = rateSlider.value;
                 synth.speak(utterThis);
-            } else {
-                alert("왼쪽 창에 영문을 입력하거나 뉴스의 [🔊 요약 듣기]를 눌러주세요!");
             }
         }
-
         function stopText() { synth.cancel(); }
     </script>
 
@@ -292,6 +348,12 @@
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #4f46e5;
+        }
+
+        /* range slider styling */
+        input[type=range]::-webkit-slider-thumb {
+            border-radius: 100px;
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
         }
     </style>
 </body>
